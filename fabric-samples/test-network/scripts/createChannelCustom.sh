@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # imports  
-. scripts/envVarCustom.sh
+. scripts/envVar.sh
 . scripts/utils.sh
 
 CHANNEL_NAME="$1"
@@ -47,7 +47,11 @@ createChannel() {
 joinChannel() {
   FABRIC_CFG_PATH=$PWD/../config/
   ORG=$1
-  setGlobals $ORG
+  PEER_PORT=$2
+  PEER_NUM=$3
+  #./scripts/envVarParametrized.sh setGlobalsForPeer $ORG $PEER_PORT
+  #setGlobals $ORG
+  setGlobalsForPeer $ORG $PEER_PORT
 	local rc=1
 	local COUNTER=1
 	## Sometimes Join takes time, hence retry
@@ -61,19 +65,19 @@ joinChannel() {
 		COUNTER=$(expr $COUNTER + 1)
 	done
 	cat log.txt
-	verifyResult $res "After $MAX_RETRY attempts, peer0.org${ORG} has failed to join channel '$CHANNEL_NAME' "
+	verifyResult $res "After $MAX_RETRY attempts, peer${PEER_NUM}.org${ORG} has failed to join channel '$CHANNEL_NAME' "
 }
 
 setAnchorPeer() {
   ORG=$1
-  docker exec cli ./scripts/setAnchorPeer.sh $ORG $CHANNEL_NAME 
+  ${CONTAINER_CLI} exec cli ./scripts/setAnchorPeer.sh $ORG $CHANNEL_NAME 
 }
 
 FABRIC_CFG_PATH=${PWD}/configtx
 
-## Create channeltx
-infoln "Generating channel create transaction '${CHANNEL_NAME}.tx'"
-createChannelTx
+## Create channel genesis block
+infoln "Generating channel genesis block '${CHANNEL_NAME}.block'"
+createChannelGenesisBlock
 
 FABRIC_CFG_PATH=$PWD/../config/
 BLOCKFILE="./channel-artifacts/${CHANNEL_NAME}.block"
@@ -84,30 +88,39 @@ createChannel
 successln "Channel '$CHANNEL_NAME' created"
 
 ## Join all the peers to the channel
+num_peers=3
+cnt=0
+current_port=7051
 infoln "Joining org1 peers to the channel..."
-joinChannel 1
-joinChannel 2
-joinChannel 3
-joinChannel 4
+while [ $cnt -lt $num_peers ]
+do
+  infoln "Joining org1 peer${cnt} at port ${current_port} to the channel..."
+  joinChannel 1 $current_port $cnt
+  current_port=$(($current_port + 100))
+  cnt=$(($cnt + 1))
+done
 
+cnt=0
+current_port=9051
 infoln "Joining org2 peers to the channel..."
-joinChannel 5
-joinChannel 6
-joinChannel 7
-joinChannel 8
+while [ $cnt -lt $num_peers ]
+do
+  infoln "Joining org2 peer${cnt} at port ${current_port} to the channel..."
+  joinChannel 2 $current_port $cnt
+  current_port=$(($current_port + 100))
+  cnt=$(($cnt + 1))
+done
 
+cnt=0
+current_port=11051
 infoln "Joining org3 peers to the channel..."
-joinChannel 9
-joinChannel 10
-joinChannel 11
-joinChannel 12
-
-infoln "Joining org4 peers to the channel..."
-joinChannel 13
-joinChannel 14
-joinChannel 15
-joinChannel 16
-
+while [ $cnt -lt $num_peers ]
+do
+  infoln "Joining org3 peer${cnt} at port ${current_port} to the channel..."
+  joinChannel 3 $current_port $cnt
+  current_port=$(($current_port + 100))
+  cnt=$(($cnt + 1))
+done
 
 ## Set the anchor peers for each org in the channel
 infoln "Setting anchor peer for org1..."
@@ -116,7 +129,5 @@ infoln "Setting anchor peer for org2..."
 setAnchorPeer 2
 infoln "Setting anchor peer for org3..."
 setAnchorPeer 3
-infoln "Setting anchor peer for org4..."
-setAnchorPeer 4
 
 successln "Channel '$CHANNEL_NAME' joined"
