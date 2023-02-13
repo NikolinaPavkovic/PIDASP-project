@@ -23,7 +23,7 @@ COUNTER=1
 MAX_RETRY=5
 
 # import environment variables
-. scripts/envVar.sh
+. scripts/envVarCustom.sh
 
 # joinChannel ORG
 joinChannel() {

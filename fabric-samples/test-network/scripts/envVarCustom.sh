@@ -194,12 +194,18 @@ parsePeerConnectionParameters() {
   PEERS=""
   while [ "$#" -gt 0 ]; do
     setGlobals $1
-    PEER="peer$2.org$1"
+    PEER="peer0.org$1"
     ## Set peer addresses
-    PEERS="$PEERS $PEER"
+    #PEERS="$PEERS $PEER"
+    if [ -z "$PEERS" ]
+    then
+	    PEERS="$PEER"
+    else
+	    PEERS="$PEERS $PEER"
+    fi
     PEER_CONN_PARMS="$PEER_CONN_PARMS --peerAddresses $CORE_PEER_ADDRESS"
     ## Set path to TLS certificate
-    TLSINFO=$(eval echo "--tlsRootCertFiles \$PEER$2_ORG$1_CA")
+    TLSINFO=$(eval echo "--tlsRootCertFiles \$PEER0_ORG$1_CA")
     PEER_CONN_PARMS="$PEER_CONN_PARMS $TLSINFO"
     # shift by one to get to the next organization
     shift

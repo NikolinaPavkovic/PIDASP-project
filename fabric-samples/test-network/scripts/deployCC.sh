@@ -107,7 +107,7 @@ else
 fi
 
 # import utils
-. scripts/envVar.sh
+. scripts/envVarCustom.sh
 
 packageChaincode() {
   set -x
@@ -349,10 +349,13 @@ checkCommitReadiness 5 "\"Org1MSP\": true" "\"Org2MSP\": true" "\"Org3MSP\": tru
 checkCommitReadiness 9 "\"Org1MSP\": true" "\"Org2MSP\": true" "\"Org3MSP\": true" "\"Org4MSP\": true"
 checkCommitReadiness 13 "\"Org1MSP\": true" "\"Org2MSP\": true" "\"Org3MSP\": true" "\"Org4MSP\": true"
 
+infoln "Proslo ovde 1"
 
 
 ## now that we know for sure both orgs have approved, commit the definition
-commitChaincodeDefinition 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+commitChaincodeDefinition 1 5 9 13
+
+infoln "Proslo ovde 2"
 
 ## query on both orgs to see that the definition committed successfully
 queryCommitted 1
@@ -360,12 +363,14 @@ queryCommitted 5
 queryCommitted 9
 queryCommitted 13
 
+infoln "Proslo ovde 3"
+
 ## Invoke the chaincode - this does require that the chaincode have the 'initLedger'
 ## method defined
 if [ "$CC_INIT_FCN" = "NA" ]; then
   infoln "Chaincode initialization is not required"
 else
-  chaincodeInvokeInit 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+  chaincodeInvokeInit 1 5 9 13
 fi
 
 exit 0

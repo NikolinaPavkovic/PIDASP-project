@@ -6,7 +6,7 @@
 #
 
 # import utils
-. scripts/envVar.sh
+. scripts/envVarCustom.sh
 . scripts/configUpdate.sh
 
 

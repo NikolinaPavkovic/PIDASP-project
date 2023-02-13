@@ -23,7 +23,7 @@ MAX_RETRY=5
 
 
 # imports
-. scripts/envVar.sh
+. scripts/envVarCustom.sh
 . scripts/configUpdate.sh
 . scripts/utils.sh
 
