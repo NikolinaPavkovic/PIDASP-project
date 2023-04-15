@@ -18,6 +18,7 @@ if [ ! -d "channel-artifacts" ]; then
 fi
 
 createChannelTx() {
+	echo "USLO u Tx"
 	set -x
 	configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/${CHANNEL_NAME}.tx -channelID $CHANNEL_NAME
 	res=$?
@@ -26,7 +27,8 @@ createChannelTx() {
 }
 
 createChannel() {
-	setGlobals 1
+	echo "USLO u CreateChannel"
+	setGlobals 1 0
 	# Poll in case the raft leader is not set yet
 	local rc=1
 	local COUNTER=1
@@ -47,7 +49,8 @@ createChannel() {
 joinChannel() {
   FABRIC_CFG_PATH=$PWD/../config/
   ORG=$1
-  setGlobals $ORG
+  PEER_NUM=$2
+  setGlobals $ORG $PEER_NUM
 	local rc=1
 	local COUNTER=1
 	## Sometimes Join takes time, hence retry
@@ -66,7 +69,8 @@ joinChannel() {
 
 setAnchorPeer() {
   ORG=$1
-  docker exec cli ./scripts/setAnchorPeer.sh $ORG $CHANNEL_NAME 
+  PEER_NUM=$2
+  docker exec cli ./scripts/setAnchorPeer.sh $ORG $PEER_NUM $CHANNEL_NAME 
 }
 
 FABRIC_CFG_PATH=${PWD}/configtx
@@ -85,28 +89,28 @@ successln "Channel '$CHANNEL_NAME' created"
 
 ## Join all the peers to the channel
 infoln "Joining org1 peers to the channel..."
-joinChannel 1
-joinChannel 2
-joinChannel 3
-joinChannel 4
+joinChannel 1 0
+joinChannel 1 1
+joinChannel 1 2
+joinChannel 1 3
 
 infoln "Joining org2 peers to the channel..."
-joinChannel 5
-joinChannel 6
-joinChannel 7
-joinChannel 8
+joinChannel 2 0
+joinChannel 2 1
+joinChannel 2 2
+joinChannel 2 3
 
 infoln "Joining org3 peers to the channel..."
-joinChannel 9
-joinChannel 10
-joinChannel 11
-joinChannel 12
+joinChannel 3 0
+joinChannel 3 1
+joinChannel 3 2
+joinChannel 3 3
 
 infoln "Joining org4 peers to the channel..."
-joinChannel 13
-joinChannel 14
-joinChannel 15
-joinChannel 16
+joinChannel 4 0
+joinChannel 4 1
+joinChannel 4 2
+joinChannel 4 3
 
 
 ## Set the anchor peers for each org in the channel

@@ -181,7 +181,7 @@ function createOrgs() {
 
     IMAGE_TAG=${CA_IMAGETAG} docker-compose -f $COMPOSE_FILE_CA up -d 2>&1
 
-    . organizations/fabric-ca/registerEnroll.sh
+    . organizations/fabric-ca/registerEnrollCustom.sh
 
   while :
     do
@@ -194,19 +194,19 @@ function createOrgs() {
 
     infoln "Creating Org1 Identities"
 
-    createOrg1
+    createOrg org1 7054
 
     infoln "Creating Org2 Identities"
 
-    createOrg2
+    createOrg org2 8054
     
     infoln "Creating Org3 Identities"
 
-    createOrg3
+    createOrg org3 10054
     
     infoln "Creating Org4 Identities"
 
-    createOrg4
+    createOrg org4 11054
 
     infoln "Creating Orderer Org Identities"
 

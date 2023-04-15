@@ -28,7 +28,7 @@ createAnchorPeerUpdate() {
     PORT=11051
   elif [ $ORG -eq 4 ]; then
     HOST="peer0.org4.example.com"
-    PORT=11051
+    PORT=12051
   else
     errorln "Org${ORG} unknown"
   fi
@@ -53,8 +53,9 @@ updateAnchorPeer() {
 }
 
 ORG=$1
-CHANNEL_NAME=$2
-setGlobalsCLI $ORG
+PEER_NUM=$2
+CHANNEL_NAME=$3
+setGlobalsCLI $ORG $PEER_NUM
 
 createAnchorPeerUpdate 
 
